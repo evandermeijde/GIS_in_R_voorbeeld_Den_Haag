@@ -154,7 +154,15 @@ hist(energielabels$MEAN_label)
 hist(log10(energielabels$MEAN_label))
 ```
 ## Raster Satelliet Data
-Via de NASA website heb ik rasterdata gedownload van de coordinaten van Den Haag. Deze data is niet direct te downloaden, maar de file staat in de github. Het is een .hdf file, hier is echt gdal voor nodig. Dit installeren op Windows had nog wat voeten in de aarde, maar het is uiteindelijk gelukt. Ik ben erg benieuwd hoe dat op andere besturingssystemen gaat.
+Op de website van de VU ("http://geoplaza.vu.nl/data/dataset/topraster") heb ik een raster kaart gevonden (.tif). Helaas lukt het niet om deze vanuit R te downloaden, maar de file staat in de github. Het gaat om topografische rasterdata. Dit houdt in dat elk vierkantje (raster) een waarde heeft gekregen voor een bepaald soort bodemgebruik. Als we de standaardplotfunctie gebruiken, zonder verdere uitleg over wat een waarde betekent, gaat R ervanuit dat het een continue schaal is. De kaart die je ziet is daarom wel enigszins herkenbaar, maar niet zoals die bedoeld is.
+```{r download raster data}
+r = raster("Top_250_raster_(2009)-1516618615.tif")
+plot(r)
+data_r <- values(r)
+df_r <- as.data.frame(matrix(data=data_r,nrow=r@nrows,ncol=r@ncols,byrow = TRUE))
+```
+
+
 
 
 
