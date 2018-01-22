@@ -55,11 +55,11 @@ tm_shape(energielabels) +
   tm_scale_bar()
 ```
 ## Kaart Blokverwarming
-We proberen de file weer in te lezen met readOGR.
+Nu proberen we de file met blokverwarming in te lezen met readOGR.
 ```{r readOGR blokverwarming}
 # blokverwarming <- readOGR(f_blokverwarming)   # geeft een error
 ```
-Die geeft een error, omdat blokverwarming een multiploint shapefile is. Dat formaat kan niet worden ingelezen met package gdal. We gebruiken st_read uit package sf. NB readOGR heeft de voorkeur, mits die bruikbaar is natuurlijk. Vervolgens plotten we de punten met behulp van base plot.
+Die geeft een error, omdat blokverwarming een multiploint shapefile is. Dat formaat kan niet worden ingelezen met package gdal. We gebruiken st_read uit package sf. (NB readOGR heeft de voorkeur, mits die bruikbaar is natuurlijk.) Vervolgens plotten we de punten met behulp van base plot.
 ```{r st_read blokverwarming}
 require(sf)
 blokverwarming <- st_read(f_blokverwarming)
@@ -93,7 +93,7 @@ tm_shape(energielabels) +
   tm_scale_bar()
 ```
 ## Open Street Map als referentie
-Alleen de p5 vormen zijn eigenlijk niet genoeg voor een kaart. Om een basisreferentie van Den Haag/Nederland te hebben nemen we een OSM als achtergrond. We kunnen bijvoorbeeld ggmap gebruiken.
+Alleen de vormen van p5 gebieden zijn eigenlijk niet genoeg voor een kaart. Om een basisreferentie van Den Haag/Nederland te hebben nemen we een OSM als achtergrond. We kunnen bijvoorbeeld ggmap gebruiken.
 ```{r Den Haag Basemap}
 require(ggmap)
 # Den Haag longitude and latitude
@@ -136,9 +136,11 @@ Laten we ze naast elkaar plotten om ze te vergelijken.
 tmap_mode("plot")
 plot1 <- tm_shape(energielabels) +
   tm_polygons("MEAN_label", style="jenks", alpha=.8, palette=colorRampPalette(c("green", "red"))(5))+
+  tm_compass(type="arrow", position=c("right", "top"), fontsize = 2 ) +
   tm_scale_bar()
 plot2 <- tm_shape(energielabels) +
   tm_polygons("N_blokverwarming", style="jenks", alpha=.8, palette=colorRampPalette(c("lightyellow", "brown"))(10)) +
+  tm_compass(type="arrow", position=c("right", "top"), fontsize = 2 ) +
   tm_scale_bar()
 require(grid)
 grid.newpage()
@@ -146,10 +148,10 @@ pushViewport(viewport(layout=grid.layout(1,2)))
 print(plot1, vp=viewport(layout.pos.col = 1))
 print(plot2, vp=viewport(layout.pos.col = 2))
 ```
-Het lijkt niet gecorreleerd te zijn, maar we testen het lekker toch. Verrassend genoeg is er wel een significante correlatie. p5 gebieden zonder blkoverwarming hebben een gemiddeld energielabel van 4.8 (tussen D en E). Per pand met blokverwarming gaat daar gemiddeld 0.03 af.
+Het lijkt niet gecorreleerd te zijn, maar we testen het lekker toch. Eerst kijken we of energielabel normaal verdeeld is. Helaas is dat niet zo, ook niet na een logtransformatie. 
 ```{r test correlatie blokverwarming en energielabel}
-fit_lm <- lm(MEAN_label ~ N_blokverwarming, energielabels)
-summary(fit_lm)
+hist(energielabels$MEAN_label)
+hist(log10(energielabels$MEAN_label))
 ```
 ## Raster Satelliet Data
 Via de NASA website heb ik rasterdata gedownload van de coordinaten van Den Haag. Deze data is niet direct te downloaden, maar de file staat in de github. Het is een .hdf file, hier is echt gdal voor nodig. Dit installeren op Windows had nog wat voeten in de aarde, maar het is uiteindelijk gelukt. Ik ben erg benieuwd hoe dat op andere besturingssystemen gaat.
