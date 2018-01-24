@@ -154,14 +154,29 @@ hist(energielabels$MEAN_label)
 hist(log10(energielabels$MEAN_label))
 ```
 ## Raster Satelliet Data
-Op de website van de VU ("http://geoplaza.vu.nl/data/dataset/topraster") heb ik een raster kaart gevonden (.tif). Helaas lukt het niet om deze vanuit R te downloaden, maar de file staat in de github. Het gaat om topografische rasterdata. Dit houdt in dat elk vierkantje (raster) een waarde heeft gekregen voor een bepaald soort bodemgebruik. Als we de standaardplotfunctie gebruiken, zonder verdere uitleg over wat een waarde betekent, gaat R ervanuit dat het een continue schaal is. De kaart die je ziet is daarom wel enigszins herkenbaar, maar niet zoals die bedoeld is.
+Op de website van de VU ("http://geoplaza.vu.nl/data/dataset/topraster") heb ik een raster kaart gevonden (.tif). Helaas lukt het niet om deze vanuit R te downloaden, maar de file staat in de github. Het gaat om topografische rasterdata. Dit houdt in dat elk vierkantje (raster) een kleur heeft gekregen voor een bepaald soort bodemgebruik. Deze kleur bestaat uit drie waarden (RGB). Het gaat hier dus om een 3 layer .tif. We lezen de drie lagen apart in, en plotten ze. Als je R zelf de kleuren laat kiezen krijg je bij elke laag dezelfde, 'groenig'.
 ```{r download raster data}
-r = raster("Top_250_raster_(2009)-1516618615.tif")
-plot(r)
-data_r <- values(r)
-df_r <- as.data.frame(matrix(data=data_r,nrow=r@nrows,ncol=r@ncols,byrow = TRUE))
+require(raster)
+r1 = raster("Top_250_raster_(2009)-1516618615.tif", band = 1)
+r2 = raster("Top_250_raster_(2009)-1516618615.tif", band = 2)
+r3 = raster("Top_250_raster_(2009)-1516618615.tif", band = 3)
+plot(r1); plot(r2); plot(r3)
 ```
-
+Eigenlijk hebben we daar niet zoveel aan. We willen de drie lagen natuurlijk over elkaar bekijken. Met het stack() commando kunnen we drie lagen in één keer inlezen. Met plotRGB() kunnen we de drie lagen over elkaar heen plotten, en krijgen we de keuren te zien zoals ze bedoeld zijn.
+```{r stack layers}
+r=stack("Top_250_raster_(2009)-1516618615.tif")
+plotRGB(r)
+```
+Voor de grap kunnen we ook een spatialJoin doen, bijvoorbeeld de gemiddelde waardes (RGB) per stadsdeel berekenen. Gewoon puur om te laten zien dat het kan, want een dergelijke join geeft natuurlijk helemaal geen informatie. (Pas op, duurt lang om dit chunk te runnen...)
+```{r join raster polygon}
+# Extract the raster values underlying the polygons
+v1 <- extract(r1, energielabels, fun = mean)
+v2 <- extract(r2, energielabels, fun = mean)
+v3 <- extract(r3, energielabels, fun = mean)
+output = data.frame(v1,v2,v3)
+print(output)
+```
+R print de waarschuwing: "Transforming SpatialPolygons to the CRS of the Raster". R heeft namelijk gezien dat de CRS/proj4string van beide objecten anders is. Een raster is erg lastig van projectie te veranderen, daarom veranderd R de projectie van de polygons.
 
 
 
