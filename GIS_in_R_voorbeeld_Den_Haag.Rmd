@@ -169,15 +169,23 @@ plotRGB(r)
 ```
 Voor de grap kunnen we ook een spatialJoin doen, bijvoorbeeld de gemiddelde waardes (RGB) per stadsdeel berekenen. Gewoon puur om te laten zien dat het kan, want een dergelijke join geeft natuurlijk helemaal geen informatie. (Pas op, duurt lang om dit chunk te runnen...)
 ```{r join raster polygon}
-# Extract the raster values underlying the polygons
+# met extract kunnen we per polygon een functie toepassen. bijvoorbeeld mean.
 v1 <- extract(r1, energielabels, fun = mean)
 v2 <- extract(r2, energielabels, fun = mean)
 v3 <- extract(r3, energielabels, fun = mean)
-output = data.frame(v1,v2,v3)
+v1 <- round(v1,0)
+v2 <- round(v2,0)
+v3 <- round(v3,0)
+output = data.frame(cbind(v1,v2,v3))
+names(output) = c("R","G","B")
 print(output)
 ```
 R print de waarschuwing: "Transforming SpatialPolygons to the CRS of the Raster". R heeft namelijk gezien dat de CRS/proj4string van beide objecten anders is. Een raster is erg lastig van projectie te veranderen, daarom veranderd R de projectie van de polygons.
-
+Het restullaat is zoals verwacht  tamelijk nietszeggend. Al lijkt het nog enigszins op het originele raster.
+```{r plot resultaat}
+energielabels@data <- cbind(energielabels@data,output)
+plot(energielabels,col=rgb(energielabels@data$R,energielabels@data$G,energielabels@data$B,maxColorValue = 255))
+```
 
 
 
