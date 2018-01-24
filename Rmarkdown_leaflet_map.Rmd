@@ -15,7 +15,7 @@ opts_chunk$set(fig.path='Figs/', echo=FALSE, warning=FALSE, message=FALSE, cache
 ```
 
 ## Introduction
-The Dutch city of The Hague has an open data portal containing, among other data types, geographical data. I've used two of the available geodatasets to make an interactive leaflet map.<BR><BR>
+The Dutch city of The Hague has an open data portal containing, among other data types, geographical data. I've used one of the available geodatasets to make an interactive leaflet map.<BR><BR>
   - Date: 24-1-2018
 
 ***
@@ -23,49 +23,24 @@ The Dutch city of The Hague has an open data portal containing, among other data
 ```{r eval=TRUE, echo=FALSE, comment=""}
 # file download & unzip
 download.file("http://geoportaal-ddh.opendata.arcgis.com/datasets/9cca53a6a4094a0b80e964b181a484ad_3.zip","blokverwarming.zip", mode="wb")
-
 unzip("blokverwarming.zip")
-download.file("http://geoportaal-ddh.opendata.arcgis.com/datasets/ed833f69fb82463ea63d37be00c356c3_0.zip", "energielabels.zip", mode="wb")
-unzip("energielabels.zip")
 
-# inputfileblokverwarming
-f_blokverwarming <- "blokverwarming_DH.shp"
+
 # inputfile enegielabels
 f_energielabels <- "Energielabels_Postcode_5_niveau_Den_Haag_2016.shp"
-
 
 # de layers uit de shapefile
 fl_energielabels <- ogrListLayers(f_energielabels) ## het is er slechts 1
 # lees de layer in met readOGR
 energielabels <- readOGR(f_energielabels,layer=fl_energielabels[1])
 
-
-blokverwarming <- st_read(f_blokverwarming)
-
-# wat gevogel met x en y coordinaten uit het sf object halen
-x_blok <- rep(1.1,length(blokverwarming$geometry[[1]])/2)
-y_blok <- rep(1.1,length(blokverwarming$geometry[[1]])/2)
-for (i in 1:length(blokverwarming$geometry[[1]])/2)
-{
-  x_blok[i] <-  blokverwarming$geometry[[1]][i,][1]
-  y_blok[i] <-  blokverwarming$geometry[[1]][i,][2]
-  i=i+1
-}
-blokverwarming_xy <- as.data.frame(cbind(x_blok,y_blok))
-
-blokverwarming_sp <- SpatialPoints(coords=blokverwarming_xy, proj4string = CRS(proj4string(energielabels) ) )
-
 tmap_mode("view")
 ```
 
 ## The map
-Blue dots indicating nr of 'blokverwarming' per area, color indicating energy sufficiency.
 
 ```{r map, fig.align='center', tidy=TRUE}
 tm_shape(energielabels) +
   tm_polygons("MEAN_label", style="jenks", alpha=.5, palette=colorRampPalette(c("green", "red"))(5)) +
-  tm_shape(blokverwarming_sp) +
-  tm_dots(col="blue",legend.show = FALSE, legend.is.portrait = FALSE ) +
-  tm_compass(type="arrow", position=c("right", "top"), fontsize = 2 ) + 
   tm_scale_bar()
 ```
