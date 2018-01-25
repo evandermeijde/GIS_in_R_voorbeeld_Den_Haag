@@ -185,6 +185,48 @@ Het restullaat is zoals verwacht  tamelijk nietszeggend. Al lijkt het nog enigsz
 energielabels@data <- cbind(energielabels@data,output)
 plot(energielabels,col=rgb(energielabels@data$R,energielabels@data$G,energielabels@data$B,maxColorValue = 255))
 ```
+## Panden en wegvakken Amsterdamse Veerkade
+Martijn en René hebben eerder dit jaar twee shapefiles gemaakt van de Amsterdamse Veerkade: panden, of eigenlijk gevels; en wegvakken, of eigenlijk polygonen. Laten we deze eens inlezen en bekijken in R (base plot).
+```{r panden wegvakken base}
+# readOGR op de panden (= lijnen)
+pand <- readOGR("pand_data_geo_merged.shp")
+# readOGR op de straten (= polygons)
+wegvak <- readOGR("Wegvak_geo_merged.shp")
+plot(wegvak, col="lightblue")
+lines(pand, lty=5, col="red", lwd=3)
+```
+En in tmap:
+```{r pand wegvak tmap}
+tmap_mode("view")
+tm_shape(wegvak) +
+  tm_polygons("Avg_PM10_O",style="jenks", palette=colorRampPalette(c("green", "red"))(5)) +
+  tm_shape(pand) +
+  tm_lines("Avg_AANSL", lwd = 10, lty = "dotted", style="jenks", palette=colorRampPalette(c("green", "red"))(5)) +
+  tm_scale_bar()
+```
+Er zijn een paar gekke dingetjes aan de hand. Aan de wegvakken met een lage PM10 zitten de panden(gevels) met de laagste aantallen slaapgestoorden. Er kunnen twee dingen aan de hand zijn: óf de data in de shapefile is incorrect, óf de gevels aan de PM10-rijke straten zijn voornamelijk commercieel.
+## Work in Progress Geluid
+```{r geluid}
+## Er stond ook een .tiff bestand op de dropbox (raster dus)
+geluid <- stack("RIS Geluidbelasting Veerkade 2011.tiff")
+plotRGB(geluid)
+geluid_legenda <- stack("RIS Geluidbelasting Veerkade 2011 Legenda.tiff")
+plotRGB(geluid_legenda)
+## het is niet ideaal, maar uit dit plaatje kunnen we aflezen welke kleuren welke range van dbs zijn.
+## en die kunnen we handmatig aan de rasteLayer plakken (als dat nodig is)
+## wat staat er eigenlijk in de data van geluid?
+values(geluid)
+length(values(geluid))
+## 756900 vakjes in het raster
+rgb(values(geluid),maxColorValue = 255)
+## met bovenstaande funcite maken we van RGB html kleuren. 
+length(unique(rgb(values(geluid),maxColorValue = 255)))
+## helaas zijn dit nog steeds 7801 verschillende.
+## we willen ze naar 8 verschillende terugbrengen
+## wit; grijs; groen; geel; oranje; rood; paars; blauw
+## laten we eens kijken hoeveel er een verschillend eerste teken hebben.
+unique(substring(rgb(values(geluid),maxColorValue = 255), 1, 2))
+length(unique(substring(rgb(values(geluid),maxColorValue = 255), 1, 2)))
 
 
-
+```
