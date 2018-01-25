@@ -212,21 +212,4 @@ geluid <- stack("RIS Geluidbelasting Veerkade 2011.tiff")
 plotRGB(geluid)
 geluid_legenda <- stack("RIS Geluidbelasting Veerkade 2011 Legenda.tiff")
 plotRGB(geluid_legenda)
-## het is niet ideaal, maar uit dit plaatje kunnen we aflezen welke kleuren welke range van dbs zijn.
-## en die kunnen we handmatig aan de rasteLayer plakken (als dat nodig is)
-## wat staat er eigenlijk in de data van geluid?
-values(geluid)
-length(values(geluid))
-## 756900 vakjes in het raster
-rgb(values(geluid),maxColorValue = 255)
-## met bovenstaande funcite maken we van RGB html kleuren. 
-length(unique(rgb(values(geluid),maxColorValue = 255)))
-## helaas zijn dit nog steeds 7801 verschillende.
-## we willen ze naar 8 verschillende terugbrengen
-## wit; grijs; groen; geel; oranje; rood; paars; blauw
-## laten we eens kijken hoeveel er een verschillend eerste teken hebben.
-unique(substring(rgb(values(geluid),maxColorValue = 255), 1, 2))
-length(unique(substring(rgb(values(geluid),maxColorValue = 255), 1, 2)))
-
-
 ```
