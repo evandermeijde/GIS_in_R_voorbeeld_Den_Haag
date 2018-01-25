@@ -101,7 +101,7 @@ DH_loc = c(lon = 4.3, lat = 52.05 )
 DH_basemap <- get_map(location = DH_loc, zoom = 12 )
 ggmap(DH_basemap)
 ```
-Maar met de instelling 'tmap_mode("view")' kun je een in-/uitzomobare kaart maken waar meteen al een basemap ondergeplot wordt. (Alleen kan dan het kompas niet laten zien worden.) Als je helemaal inzoomt kun je precies zien welk kadasterveld blokverwarming heeft.
+Maar met de instelling 'tmap_mode("view")' kun je een in-/uitzoombare kaart maken waar meteen al een basemap ondergeplot wordt. (Alleen kan dan het kompas niet laten zien worden.) Als je helemaal inzoomt kun je precies zien welk kadasterveld blokverwarming heeft.
 
 ```{r tmap view}
 tmap_mode("view")
@@ -178,9 +178,8 @@ v2 <- round(v2,0)
 v3 <- round(v3,0)
 output = data.frame(cbind(v1,v2,v3))
 names(output) = c("R","G","B")
-print(output)
 ```
-R print de waarschuwing: "Transforming SpatialPolygons to the CRS of the Raster". R heeft namelijk gezien dat de CRS/proj4string van beide objecten anders is. Een raster is erg lastig van projectie te veranderen, daarom veranderd R de projectie van de polygons.
+R print de waarschuwing: "Transforming SpatialPolygons to the CRS of the Raster". R heeft namelijk gezien dat de projectie (CRS/proj4string) van beide objecten anders is. Een raster is erg lastig van projectie te veranderen, daarom veranderd R de projectie van de polygons.
 Het restullaat is zoals verwacht  tamelijk nietszeggend. Al lijkt het nog enigszins op het originele raster.
 ```{r plot resultaat}
 energielabels@data <- cbind(energielabels@data,output)
