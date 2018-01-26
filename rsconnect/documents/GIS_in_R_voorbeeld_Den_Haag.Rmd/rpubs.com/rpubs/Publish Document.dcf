@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/352353/df4944ed5e6040af9a73f17360fed137
+bundleId: https://api.rpubs.com/api/v1/document/352353/df4944ed5e6040af9a73f17360fed137
+url: http://rpubs.com/evandermeijde/352353
+when: 1516978260.52938
